@@ -4,16 +4,20 @@ const fs = require('fs')
 
 function saveFileFromBytes(title, bytes) {
 	const b = new Buffer(bytes)
-	for (let i = 0; i < bytes.length; i++) {
+	for (var i = 0; i < bytes.length; i++) {
 		b[i] = bytes[i]
 	}
 	const writeFile = promisify(fs.writeFile)
 	return writeFile(`${title.replace(/\//g, '-').replace(' (PDF)', '')}.pdf`, b, 'binary')
 }
 
-function exportPDF(evernoteToken, search = 'intitle:(PDF)') {
+function exportPDF(evernoteToken, search) {
 	if (!evernoteToken) {
 		throw new Error('missing one of the arguments')
+	}
+
+	if (!search) { 
+		search = 'intitle:(PDF)'
 	}
 
 	const filter = new Evernote.NoteFilter({ words: search, order: Evernote.NoteSortOrder.CREATED, ascending: false })
@@ -24,8 +28,8 @@ function exportPDF(evernoteToken, search = 'intitle:(PDF)') {
 	const getNote = promisify(noteStore.getNote)
 	const deleteNote = promisify(noteStore.deleteNote)
 
-	return findNotesMetadata(filter, 0, 1, noteSpec).then(({ notes }) => 
-		getNote(notes[0].guid, false, true, false, false).then((note) => 
+	return findNotesMetadata(filter, 0, 1, noteSpec).then((data) => 
+		getNote(data.notes[0].guid, false, true, false, false).then((note) => 
 			saveFileFromBytes(note.title, note.resources[0].data.body).then(() => 
 				deleteNote(note.guid)
 			)
