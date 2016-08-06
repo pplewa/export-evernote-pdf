@@ -17,7 +17,7 @@ function exportPDF(evernoteToken, search) {
 	}
 
 	if (!search) { 
-		search = 'intitle:(PDF)'
+		search = 'intitle:(PDF) resource:application/pdf'
 	}
 
 	const filter = new Evernote.NoteFilter({ words: search, order: Evernote.NoteSortOrder.CREATED, ascending: false })
