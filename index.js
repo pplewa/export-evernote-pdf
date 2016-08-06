@@ -29,7 +29,7 @@ function exportPDF(evernoteToken, search) {
 	const deleteNote = promisify(noteStore.deleteNote)
 
 	return findNotesMetadata(filter, 0, 1, noteSpec).then((data) => 
-		getNote(data.notes[0].guid, false, true, false, false).then((note) => 
+		data.notes[0] && getNote(data.notes[0].guid, false, true, false, false).then((note) => 
 			saveFileFromBytes(note.title, note.resources[0].data.body).then(() => 
 				deleteNote(note.guid)
 			)
