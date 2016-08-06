@@ -11,16 +11,16 @@ function saveFileFromBytes(title, bytes) {
 	return writeFile(title, b, 'binary')
 }
 
-function exportPDF(evernoteToken, search) {
+function exportPDF(evernoteToken, options) {
 	if (!evernoteToken) {
 		throw new Error('missing one of the arguments')
 	}
 
-	if (!search) { 
-		search = 'intitle:(PDF) resource:application/pdf'
+	if (!options.search) { 
+		options.search = 'intitle:(PDF) resource:application/pdf'
 	}
 
-	const filter = new Evernote.NoteFilter({ words: search, order: Evernote.NoteSortOrder.CREATED, ascending: false })
+	const filter = new Evernote.NoteFilter({ words: options.search, order: Evernote.NoteSortOrder.CREATED, ascending: false })
 	const noteSpec = new Evernote.NotesMetadataResultSpec({ includeTitle: true })
 	const evernoteClient = new Evernote.Client({ token: evernoteToken, sandbox: false })
 	const noteStore = evernoteClient.getNoteStore()
@@ -30,7 +30,7 @@ function exportPDF(evernoteToken, search) {
 
 	return findNotesMetadata(filter, 0, 1, noteSpec).then((data) => 
 		data.notes[0] && getNote(data.notes[0].guid, false, true, false, false).then((note) => {
-			const title = `${note.title.replace(/\//g, '-').replace(' (PDF)', '')}.pdf`
+			const title = `${options.path || ''}${note.title.replace(/\//g, '-').replace(' (PDF)', '')}.pdf`
 			return saveFileFromBytes(title, note.resources[0].data.body).then(() => 
 				deleteNote(note.guid).then(() => title)
 			)
