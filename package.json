@@ -1,6 +1,6 @@
 {
   "name": "export-evernote-pdf",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Exports PDF file from Evernote Note",
   "main": "index.js",
   "scripts": {

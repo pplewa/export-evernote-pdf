@@ -8,7 +8,7 @@ function saveFileFromBytes(title, bytes) {
 		b[i] = bytes[i]
 	}
 	const writeFile = promisify(fs.writeFile)
-	return writeFile(`${title.replace(/\//g, '-').replace(' (PDF)', '')}.pdf`, b, 'binary')
+	return writeFile(title, b, 'binary')
 }
 
 function exportPDF(evernoteToken, search) {
@@ -29,11 +29,12 @@ function exportPDF(evernoteToken, search) {
 	const deleteNote = promisify(noteStore.deleteNote)
 
 	return findNotesMetadata(filter, 0, 1, noteSpec).then((data) => 
-		data.notes[0] && getNote(data.notes[0].guid, false, true, false, false).then((note) => 
-			saveFileFromBytes(note.title, note.resources[0].data.body).then(() => 
-				deleteNote(note.guid)
+		data.notes[0] && getNote(data.notes[0].guid, false, true, false, false).then((note) => {
+			const title = `${note.title.replace(/\//g, '-').replace(' (PDF)', '')}.pdf`
+			return saveFileFromBytes(title, note.resources[0].data.body).then(() => 
+				deleteNote(note.guid).then(() => title)
 			)
-		)
+		})
 	)
 }
 
